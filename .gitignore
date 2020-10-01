@@ -1,0 +1,10 @@
+# package directories
+node_modules
+jspm_packages
+secrets_local.json
+secrets_local_bns.json
+secrets_local_template.json
+# Serverless directories
+.serverless
+/.webpack
+/.idea

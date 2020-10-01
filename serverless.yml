@@ -1,0 +1,781 @@
+# Welcome to Serverless!
+#
+# This file is the main config file for your service.
+# It's very minimal at this point and uses default values.
+# You can always add more config options for more control.
+# We've included some commented out config examples here.
+# Just uncomment any of them to get that config option.
+#
+# For full config options, check the docs:
+#    docs.serverless.com
+#
+# Happy Coding!
+
+
+service: ${env:PRJ}-${env:ENV}
+package:
+  individually: true
+custom:
+  serverless-offline:
+    useChildProcesses: true
+  splitStacks:
+    perFunction: false
+    perType: true
+    perGroupFunction: false
+  bundle:
+    ignorePackages:
+      - pg
+      - sqlite3
+      - tedious
+      - pg-hstore
+  secrets:
+    dev: 
+      invoke_endpoint: https://lambda.us-east-1.amazonaws.com
+      user_pool_id: ${ssm:/${env:ENV}/user-pool-id}
+      db_name: ${ssm:/${env:ENV}/db-name}
+      db_user: ${ssm:/${env:ENV}/db-user}
+      db_host: ${ssm:/${env:ENV}/db-host}
+      db_password: ${ssm:/${env:ENV}/db-password}
+      db_port: 3306
+      account_id: ${ssm:/${env:ENV}/account-id}
+      region: ${ssm:/${env:ENV}/region}
+      topic_arn: arn:aws:sns:${self:custom.secrets.dev.region}:${self:custom.secrets.dev.account_id}:${ssm:/${env:ENV}/notification-topic}
+      frontend_app_url: ${ssm:/${env:ENV}/frontend-app-url}
+      frontend_admin_url: ${ssm:/${env:ENV}/frontend-admin-url}
+      authorize_payment_api_login_id: ${ssm:/${env:ENV}/authorize-payment-api-login-id}
+      authorize_transaction_key: ${ssm:/${env:ENV}/authorize-transaction-key}
+      user_pool_client_id: ${ssm:/${env:ENV}/user-pool-client-id}
+      client_email: ${ssm:/${env:ENV}/client-email}
+      enable_phone_notification: ${ssm:/${env:ENV}/enable-phone-notification}
+      texas_tax_enable: ${ssm:/${env:ENV}/texas-tax-enable}
+      super_admin_group: ${ssm:/${env:ENV}/super_admin_group}
+      super_admin_role: ${ssm:/${env:ENV}/super_admin_role}
+      using_roles: ${ssm:/${env:ENV}/using_roles}
+      using_thumbnail: ${ssm:/${env:ENV}/using_thumbnail}
+      notification_topic: ${ssm:/${env:ENV}/notification-topic}
+      image_bucket: ${env:PRJ}-images
+    test: 
+      invoke_endpoint: https://lambda.us-east-1.amazonaws.com
+      user_pool_id: ${ssm:/${env:ENV}/user-pool-id}
+      db_name: ${ssm:/${env:ENV}/db-name}
+      db_user: ${ssm:/${env:ENV}/db-user}
+      db_host: ${ssm:/${env:ENV}/db-host}
+      db_password: ${ssm:/${env:ENV}/db-password}
+      db_port: 3306
+      account_id: ${ssm:/${env:ENV}/account-id}
+      region: ${ssm:/${env:ENV}/region}
+      topic_arn: arn:aws:sns:${self:custom.secrets.test.region}:${self:custom.secrets.test.account_id}:${ssm:/${env:ENV}/notification-topic}
+      frontend_app_url: ${ssm:/${env:ENV}/frontend-app-url}
+      frontend_admin_url: ${ssm:/${env:ENV}/frontend-admin-url}
+      authorize_payment_api_login_id: ${ssm:/${env:ENV}/authorize-payment-api-login-id}
+      authorize_transaction_key: ${ssm:/${env:ENV}/authorize-transaction-key}
+      user_pool_client_id: ${ssm:/${env:ENV}/user-pool-client-id}
+      client_email: ${ssm:/${env:ENV}/client-email}
+      enable_phone_notification: ${ssm:/${env:ENV}/enable-phone-notification}
+      texas_tax_enable: ${ssm:/${env:ENV}/texas-tax-enable}
+      super_admin_group: ${ssm:/${env:ENV}/super_admin_group}
+      super_admin_role: ${ssm:/${env:ENV}/super_admin_role}
+      using_roles: ${ssm:/${env:ENV}/using_roles}
+      using_thumbnail: ${ssm:/${env:ENV}/using_thumbnail}
+      image_bucket: ${env:ENV}-${env:PRJ}-images
+      notification_topic: ${ssm:/${env:ENV}/notification-topic}
+    prod: 
+      invoke_endpoint: https://lambda.us-east-1.amazonaws.com
+      user_pool_id: ${ssm:/${env:ENV}/user-pool-id}
+      db_name: ${ssm:/${env:ENV}/db-name}
+      db_user: ${ssm:/${env:ENV}/db-user}
+      db_host: ${ssm:/${env:ENV}/db-host}
+      db_password: ${ssm:/${env:ENV}/db-password}
+      db_port: 3306
+      account_id: ${ssm:/${env:ENV}/account-id}
+      region: ${ssm:/${env:ENV}/region}
+      topic_arn: arn:aws:sns:${self:custom.secrets.test.region}:${self:custom.secrets.test.account_id}:${ssm:/${env:ENV}/notification-topic}
+      frontend_app_url: ${ssm:/${env:ENV}/frontend-app-url}
+      frontend_admin_url: ${ssm:/${env:ENV}/frontend-admin-url}
+      authorize_payment_api_login_id: ${ssm:/${env:ENV}/authorize-payment-api-login-id}
+      authorize_transaction_key: ${ssm:/${env:ENV}/authorize-transaction-key}
+      user_pool_client_id: ${ssm:/${env:ENV}/user-pool-client-id}
+      client_email: ${ssm:/${env:ENV}/client-email}
+      enable_phone_notification: ${ssm:/${env:ENV}/enable-phone-notification}
+      texas_tax_enable: ${ssm:/${env:ENV}/texas-tax-enable}
+      super_admin_group: ${ssm:/${env:ENV}/super_admin_group}
+      super_admin_role: ${ssm:/${env:ENV}/super_admin_role}
+      using_roles: ${ssm:/${env:ENV}/using_roles}
+      using_thumbnail: ${ssm:/${env:ENV}/using_thumbnail}
+      image_bucket: ${env:ENV}-${env:PRJ}-images
+      notification_topic: ${ssm:/${env:ENV}/notification-topic}
+    local: ${file(secrets_local.json)}
+provider:
+  name: aws
+  versionFunctions: false
+  runtime: nodejs12.x
+  deploymentBucket:
+    name: ${ssm:/${env:ENV}/lambda-bucket}
+  role: ${ssm:/${env:ENV}/lambda-role-arn}
+  stage:  ${opt:stage,'dev'}
+  region: us-east-1
+  vpc:
+    securityGroupIds:
+      - ${ssm:/${env:ENV}/lambda-sg}
+    subnetIds:
+      - ${ssm:/${env:ENV}/private-subnet-1}
+      - ${ssm:/${env:ENV}/private-subnet-2}
+  environment:
+    INVOKE_ENDPOINT: ${self:custom.secrets.${self:provider.stage}.invoke_endpoint}
+    INVOKE_FUNCTION: ${self:service}-${self:provider.stage}-createsubscription
+    DB_DIALECT: 'mysql'
+    DB_NAME: ${self:custom.secrets.${self:provider.stage}.db_name}
+    DB_USERNAME: ${self:custom.secrets.${self:provider.stage}.db_user}
+    DB_PASSWORD: ${self:custom.secrets.${self:provider.stage}.db_password}
+    DB_HOST: ${self:custom.secrets.${self:provider.stage}.db_host}
+    DB_PORT: ${self:custom.secrets.${self:provider.stage}.db_port}
+    ACCOUNT_ID: ${self:custom.secrets.${self:provider.stage}.account_id}
+    REGION: ${self:custom.secrets.${self:provider.stage}.region}
+    TOPIC_ARN: ${self:custom.secrets.${self:provider.stage}.topic_arn}
+    SERVICE_NAME: ${self:service}
+    STAGE: ${self:provider.stage}
+    S3_IMAGE_BUCKET: ${self:custom.secrets.${self:provider.stage}.image_bucket}
+    FRONTEND_URL: ${self:custom.secrets.${self:provider.stage}.frontend_app_url}
+    FRONTEND_ADMIN_URL: ${self:custom.secrets.${self:provider.stage}.frontend_admin_url}
+    USER_POOL_ID: ${self:custom.secrets.${self:provider.stage}.user_pool_id}
+    AUTHORIZE_PAYMENT_API_LOGIN_ID: ${self:custom.secrets.${self:provider.stage}.authorize_payment_api_login_id}
+    AUTHORIZE_TRANSACTION_KEY: ${self:custom.secrets.${self:provider.stage}.authorize_transaction_key}
+    USER_POOL_CLIENT_ID: ${self:custom.secrets.${self:provider.stage}.user_pool_client_id}
+    CLIENT_EMAIL: ${self:custom.secrets.${self:provider.stage}.client_email}
+    ENABLE_PHONE_NOTIFICATION: ${self:custom.secrets.${self:provider.stage}.enable_phone_notification}
+    TEXAS_TAX_ENABLE: ${self:custom.secrets.${self:provider.stage}.texas_tax_enable}
+    SUPER_ADMIN_GROUP: ${self:custom.secrets.${self:provider.stage}.super_admin_group}
+    SUPER_ADMIN_ROLE: ${self:custom.secrets.${self:provider.stage}.super_admin_role}
+    USING_ROLES: ${self:custom.secrets.${self:provider.stage}.using_roles}
+    USING_THUMBNAIL: ${self:custom.secrets.${self:provider.stage}.using_thumbnail}
+    NOTIFICATION_TOPIC: ${self:custom.secrets.${self:provider.stage}.notification_topic}
+functions:
+  signup:
+    handler: services/users/signup.signup
+    name: ${self:service}-${self:provider.stage}-signup
+    events:
+      - http:
+          path: users/signup
+          method: post
+          cors: true
+    memorySize: 128
+  # getverifiedmethod:
+  #   handler: services/users/getverifiedmethod.getmethod
+  #   name: ${self:service}-${self:provider.stage}-getverifiedmethod
+  #   events:
+  #     - http:
+  #         path: users/getverifiedmethod
+  #         method: post
+  #         cors: true
+  #   memorySize: 128
+    
+  consumerLogin:
+    handler: services/users/login.login
+    name: ${self:service}-${self:provider.stage}-consumerlogin
+    events:
+      - http:
+          path: users/login
+          method: post
+          cors: true
+          authorizer:
+            name: authorizer
+            arn: arn:aws:cognito-idp:${self:custom.secrets.${self:provider.stage}.region}:${self:custom.secrets.${self:provider.stage}.account_id}:userpool/${self:custom.secrets.${self:provider.stage}.user_pool_id}
+
+    memorySize: 128
+  consumerSignOut:
+    handler: services/users/signout.main
+    name: ${self:service}-${self:provider.stage}-consumersignout
+    events:
+      - http:
+          path: users/signout
+          method: put
+          cors: true
+  updateUser:
+    handler: services/users/updateUser.main
+    name: ${self:service}-${self:provider.stage}-updateuser
+    events:
+      - http:
+          path: users/updateuser/{id}
+          method: put
+          cors: true
+          authorizer:
+            name: authorizer
+            arn: arn:aws:cognito-idp:${self:custom.secrets.${self:provider.stage}.region}:${self:custom.secrets.${self:provider.stage}.account_id}:userpool/${self:custom.secrets.${self:provider.stage}.user_pool_id}
+  registerPhysicalProduct:
+    handler: services/products/registerPhysicalProduct.main
+    name: ${self:service}-${self:provider.stage}-registerphysicalproduct
+    events:
+      - http:
+          path: products/registerPhysicalProduct
+          method: post
+          cors: true
+          authorizer:
+            name: authorizer
+            arn: arn:aws:cognito-idp:${self:custom.secrets.${self:provider.stage}.region}:${self:custom.secrets.${self:provider.stage}.account_id}:userpool/${self:custom.secrets.${self:provider.stage}.user_pool_id}
+    memorySize: 256
+  createSubscription:
+    handler: services/sns/createSubscription.main
+    name: ${self:service}-${self:provider.stage}-createsubscription
+    # events:
+    #   - http:
+    #       path: sns/createsubscription
+    #       method: post
+    #       cors: true
+    memorySize: 512
+
+  getNotifications:
+    handler: services/notification/getNotification.main
+    name: ${self:service}-${self:provider.stage}-getnotifications
+    events:
+      - http:
+          path: notifications/getnotification/{id}
+          method: get
+          cors: true
+          authorizer:
+            name: authorizer
+            arn: arn:aws:cognito-idp:${self:custom.secrets.${self:provider.stage}.region}:${self:custom.secrets.${self:provider.stage}.account_id}:userpool/${self:custom.secrets.${self:provider.stage}.user_pool_id}
+    memorySize: 512
+  
+  changeSubscription:
+    handler: services/sns/changeSubscription.main
+    name: ${self:service}-${self:provider.stage}-changesubscription
+    # events:
+    #   - http:
+    #       path: sns/changeSubscription
+    #       method: post
+    #       cors: true
+          # authorizer:
+          #   name: authorizer
+          #   arn: arn:aws:cognito-idp:${self:custom.secrets.${self:provider.stage}.region}:${self:custom.secrets.${self:provider.stage}.account_id}:userpool/${self:custom.secrets.${self:provider.stage}.user_pool_id}
+    memorySize: 512
+  registerNotification:
+    handler: services/notification/registerNotification.main
+    name: ${self:service}-${self:provider.stage}-registernotification
+    memorySize: 512
+
+  publishNewProductMessage:
+    handler: services/sns/publishNewProductMessage.main
+    name: ${self:service}-${self:provider.stage}-publishnewproductmessage
+    memorySize: 512
+
+  readNotification:
+    handler: services/notification/readNotification.main
+    name: ${self:service}-${self:provider.stage}-readnotification
+    events:
+      - http:
+          path: notifications/readnotification/{id}
+          method: put
+          cors: true
+          authorizer:
+            name: authorizer
+            arn: arn:aws:cognito-idp:${self:custom.secrets.${self:provider.stage}.region}:${self:custom.secrets.${self:provider.stage}.account_id}:userpool/${self:custom.secrets.${self:provider.stage}.user_pool_id}
+    memorySize: 256
+
+  sendEmails:
+    handler: services/ses/sendEmails.main
+    name: ${self:service}-${self:provider.stage}-sendemails
+    memorySize: 512
+
+  registerWebinarProduct:
+    handler: services/products/registerWebinarProduct.main
+    name: ${self:service}-${self:provider.stage}-registerwebinarproduct
+    events:
+      - http:
+          path: products/registerwebinarproduct
+          method: post
+          cors: true
+          authorizer:
+            name: authorizer
+            arn: arn:aws:cognito-idp:${self:custom.secrets.${self:provider.stage}.region}:${self:custom.secrets.${self:provider.stage}.account_id}:userpool/${self:custom.secrets.${self:provider.stage}.user_pool_id}
+    memorySize: 512
+  createTopic:
+    handler: services/sns/createTopic.main
+    name: ${self:service}-${self:provider.stage}-createtopic
+    memorySize: 256
+  purchasePhysicalProduct:
+    handler: services/products/purchasePhysicalProduct.main
+    name: ${self:service}-${self:provider.stage}-purchasephysicalproduct
+    events:
+      - http:
+          path: products/purchasephysicalproduct
+          method: post
+          cors: true
+          authorizer:
+            name: authorizer
+            arn: arn:aws:cognito-idp:${self:custom.secrets.${self:provider.stage}.region}:${self:custom.secrets.${self:provider.stage}.account_id}:userpool/${self:custom.secrets.${self:provider.stage}.user_pool_id}
+  purchaseWebinarTicket:
+    handler: services/products/purchaseWebinarTicket.main
+    name: ${self:service}-${self:provider.stage}-purchasewebinarticket
+    events:
+      - http:
+          path:  products/purchasewebinarticket
+          method: post
+          cors: true
+          authorizer:
+            name: authorizer
+            arn: arn:aws:cognito-idp:${self:custom.secrets.${self:provider.stage}.region}:${self:custom.secrets.${self:provider.stage}.account_id}:userpool/${self:custom.secrets.${self:provider.stage}.user_pool_id}
+  getPhysicalPurchaseHistory:
+    handler: services/products/getPhysicalPurchaseHistory.main
+    name: ${self:service}-${self:provider.stage}-getphysicalpurchasehistory
+    events:
+      - http:
+          path: products/getpurchasehistory
+          method: post
+          cors: true
+          authorizer:
+            name: authorizer
+            arn: arn:aws:cognito-idp:${self:custom.secrets.${self:provider.stage}.region}:${self:custom.secrets.${self:provider.stage}.account_id}:userpool/${self:custom.secrets.${self:provider.stage}.user_pool_id}
+  getWebinarWinnerHistory:
+    handler: services/products/getWebinarWinnerHistory.main
+    name: ${self:service}-${self:provider.stage}-getwebinarwinnerhistory
+    events:
+      - http:
+          path: products/getwebinarwinnerhistory
+          method: post
+          cors: true
+          authorizer:
+            name: authorizer
+            arn: arn:aws:cognito-idp:${self:custom.secrets.${self:provider.stage}.region}:${self:custom.secrets.${self:provider.stage}.account_id}:userpool/${self:custom.secrets.${self:provider.stage}.user_pool_id}
+  postComment: 
+    handler: services/comments/postComment.main
+    name: ${self:service}-${self:provider.stage}-postcomment
+    events:
+      - http:
+          path: comments/postcomment
+          method: post
+          cors: true
+          authorizer:
+            name: authorizer
+            arn: arn:aws:cognito-idp:${self:custom.secrets.${self:provider.stage}.region}:${self:custom.secrets.${self:provider.stage}.account_id}:userpool/${self:custom.secrets.${self:provider.stage}.user_pool_id}
+  updateCommet:
+    handler: services/comments/updateComment.main
+    name: ${self:service}-${self:provider.stage}-updatecomment
+    events:
+      - http:
+          path: comments/updatecomment
+          method: put
+          cors: true
+          authorizer:
+            name: authorizer
+            arn: arn:aws:cognito-idp:${self:custom.secrets.${self:provider.stage}.region}:${self:custom.secrets.${self:provider.stage}.account_id}:userpool/${self:custom.secrets.${self:provider.stage}.user_pool_id}
+  # getAllCommentsWithUserID:
+  #   handler: services/comments/getAllCommentsWithUserID.main
+  #   name: ${self:service}-${self:provider.stage}-getallcommentswithuserid
+  #   events:
+  #     - http:
+  #         path: comments/getallcommentswithuserid/{id}
+  #         method: get
+  #         cors: true
+  #         authorizer:
+  #           name: authorizer
+  #           arn: arn:aws:cognito-idp:${self:custom.secrets.${self:provider.stage}.region}:${self:custom.secrets.${self:provider.stage}.account_id}:userpool/${self:custom.secrets.${self:provider.stage}.user_pool_id}
+  #   memorySize: 512
+  #   timeout: 10
+  # getCommentsWithProject:
+  #   handler: services/comments/getCommentsWithProject.main
+  #   name: ${self:service}-${self:provider.stage}-getcommentswithproject
+  #   events:
+  #     - http:
+  #         path: comments/getcommentswithproject/{id}
+  #         method: get
+  #         cors: true
+  #         authorizer:
+  #           name: authorizer
+  #           arn: arn:aws:cognito-idp:${self:custom.secrets.${self:provider.stage}.region}:${self:custom.secrets.${self:provider.stage}.account_id}:userpool/${self:custom.secrets.${self:provider.stage}.user_pool_id}
+  #   memorySize: 512
+  #   timeout: 10  
+  generatethumbnail:
+    handler: services/s3/generatethumbnail.main
+    name: ${self:service}-${self:provider.stage}-generatethumbnail    
+    events:
+      - s3:
+          bucket: ${self:custom.secrets.${self:provider.stage}.image_bucket}
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: public/profile
+          existing: true
+      - s3:
+          bucket: ${self:custom.secrets.${self:provider.stage}.image_bucket}
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: public/product
+          existing: true
+      - s3:
+          bucket: ${self:custom.secrets.${self:provider.stage}.image_bucket}
+          event: s3:ObjectCreated:*
+          rules:
+            - prefix: public/ffl-image
+          existing: true
+    memorySize: 512
+  getAllProducts:
+    handler: services/products/getAllProducts.main
+    name: ${self:service}-${self:provider.stage}-getallproducts
+    events:
+      - http:
+          path: products/getallproducts
+          method: post
+          cors: true
+  getProduct:
+    handler: services/products/getProduct.main
+    name: ${self:service}-${self:provider.stage}-getproduct
+    events:
+      - http:
+          path: products/getproduct
+          method: post
+          cors: true
+          authorizer:
+            name: authorizer
+            arn: arn:aws:cognito-idp:${self:custom.secrets.${self:provider.stage}.region}:${self:custom.secrets.${self:provider.stage}.account_id}:userpool/${self:custom.secrets.${self:provider.stage}.user_pool_id}
+  pinComment:
+    handler: services/comments/pinComment.main
+    name: ${self:service}-${self:provider.stage}-pinComment
+    events:
+      - http:
+          path: comments/pinComment
+          method: post
+          cors: true
+          authorizer:
+            name: authorizer
+            arn: arn:aws:cognito-idp:${self:custom.secrets.${self:provider.stage}.region}:${self:custom.secrets.${self:provider.stage}.account_id}:userpool/${self:custom.secrets.${self:provider.stage}.user_pool_id}
+  deleteComment:
+    handler: services/comments/deleteComment.main
+    name: ${self:service}-${self:provider.stage}-deleteComment
+    events:
+      - http:
+          path: comments/deleteComment
+          method: post
+          cors: true
+          authorizer:
+            name: authorizer
+            arn: arn:aws:cognito-idp:${self:custom.secrets.${self:provider.stage}.region}:${self:custom.secrets.${self:provider.stage}.account_id}:userpool/${self:custom.secrets.${self:provider.stage}.user_pool_id}
+  banUser:
+    handler: services/users/banUser.main
+    name: ${self:service}-${self:provider.stage}-banUser
+    events:
+      - http:
+          path: comments/banUser
+          method: post
+          cors: true
+          authorizer:
+            name: authorizer
+            arn: arn:aws:cognito-idp:${self:custom.secrets.${self:provider.stage}.region}:${self:custom.secrets.${self:provider.stage}.account_id}:userpool/${self:custom.secrets.${self:provider.stage}.user_pool_id}
+  getWebinarSeats: 
+    handler: services/products/getWebinarSeats.main
+    name: ${self:service}-${self:provider.stage}-getWebinarSeats
+    events:
+      - http:
+          path: products/getwebinarseats/{id}
+          method: get
+          cors: true
+          authorizer:
+            name: authorizer
+            arn: arn:aws:cognito-idp:${self:custom.secrets.${self:provider.stage}.region}:${self:custom.secrets.${self:provider.stage}.account_id}:userpool/${self:custom.secrets.${self:provider.stage}.user_pool_id}
+  reserveWebinarTicket:
+    handler: services/products/reserveWebinarTicket.main
+    name: ${self:service}-${self:provider.stage}-reservewebinarticket
+    events:
+      - http:
+          path: products/reservewebinarticket
+          method: post
+          cors: true
+          authorizer:
+            name: authorizer
+            arn: arn:aws:cognito-idp:${self:custom.secrets.${self:provider.stage}.region}:${self:custom.secrets.${self:provider.stage}.account_id}:userpool/${self:custom.secrets.${self:provider.stage}.user_pool_id}
+  getWebinarReservedStatus:
+    handler: services/products/getWebinarReservedStatus.main
+    name: ${self:service}-${self:provider.stage}-getwebinarreservedstatus
+    events:
+      - http:
+          path: products/getwebinarreservedstatus
+          method: post
+          cors: true
+          authorizer:
+            name: authorizer
+            arn: arn:aws:cognito-idp:${self:custom.secrets.${self:provider.stage}.region}:${self:custom.secrets.${self:provider.stage}.account_id}:userpool/${self:custom.secrets.${self:provider.stage}.user_pool_id}
+  cancelReservedSeats:
+    handler: services/products/cancelReservedSeats.main
+    name: ${self:service}-${self:provider.stage}-cancelReservedSeats
+    events:
+      - http:
+          path: products/cancelReservedSeats
+          method: post
+          cors: true
+          authorizer:
+            name: authorizer
+            arn: arn:aws:cognito-idp:${self:custom.secrets.${self:provider.stage}.region}:${self:custom.secrets.${self:provider.stage}.account_id}:userpool/${self:custom.secrets.${self:provider.stage}.user_pool_id}
+  postFAQ: 
+    handler: services/support/postFAQ.main
+    name: ${self:service}-${self:provider.stage}-postfaq
+    events:
+      - http:
+          path: support/postfaq
+          method: post
+          cors: true
+          authorizer:
+            name: authorizer
+            arn: arn:aws:cognito-idp:${self:custom.secrets.${self:provider.stage}.region}:${self:custom.secrets.${self:provider.stage}.account_id}:userpool/${self:custom.secrets.${self:provider.stage}.user_pool_id}
+  getAllFAQ:
+    handler: services/support/getAllFAQ.main
+    name: ${self:service}-${self:provider.stage}-getallfaq
+    events:
+      - http:
+          path: support/getallfaq
+          method: get
+          cors: true
+          authorizer:
+            name: authorizerFunc
+            type: token
+          # authorizer:
+          #   name: authorizer
+          #   arn: arn:aws:cognito-idp:${self:custom.secrets.${self:provider.stage}.region}:${self:custom.secrets.${self:provider.stage}.account_id}:userpool/${self:custom.secrets.${self:provider.stage}.user_pool_id}
+  getContactUsDescription:
+    handler: services/support/getContactUsDescription.main
+    name: ${self:service}-${self:provider.stage}-getcontactusdescription
+    events:
+      - http:
+          path: support/getcontactusdescription
+          method: get
+          cors: true
+  updateSiteSettings:
+    handler: services/support/updateSiteSettings.main
+    name: ${self:service}-${self:provider.stage}-updatesitesettings
+    events:
+      - http:
+          path: support/updatesitesettings
+          method: put
+          cors: true
+          authorizer:
+            name: authorizer
+            arn: arn:aws:cognito-idp:${self:custom.secrets.${self:provider.stage}.region}:${self:custom.secrets.${self:provider.stage}.account_id}:userpool/${self:custom.secrets.${self:provider.stage}.user_pool_id}
+  contactsupport:
+    handler: services/ses/contactsupport.main
+    name: ${self:service}-${self:provider.stage}-contactsupport
+    events:
+      - http:
+          path: support/contactsupport
+          method: post
+          cors: true
+  getSocialMediaLinks:
+    handler: services/support/getSocialMediaLinks.main
+    name: ${self:service}-${self:provider.stage}-getsocialmedialinks
+    events:
+      - http:
+          path: support/getsocialmedialinks
+          method: get
+          cors: true
+  forgotPasswordLink:
+    handler: services/users/forgotPassword.main
+    name: ${self:service}-${self:provider.stage}-forgotpasswordlink
+    events:
+      - http:
+          path: users/forgotpassword
+          method: post
+          cors: true
+  resetPassword:
+    handler: services/users/resetPassword.main
+    name: ${self:service}-${self:provider.stage}-resetpassword
+    events:
+      - http:
+          path: users/resetpassword
+          method: put
+          cors: true
+  chargeCreditCard:
+    handler: services/payment/chargeCreditCard.main
+    name: ${self:service}-${self:provider.stage}-chargeCreditCard
+  getAllSiteSettings:
+    handler: services/support/getAllSiteSettings.main
+    name: ${self:service}-${self:provider.stage}-getAllSiteSettings
+    events:
+      - http:
+          path: support/getallsitesettings
+          method: get
+          cors: true
+  setverifiedStatus:
+    handler: services/users/setverifiedStatus.main
+    name: ${self:service}-${self:provider.stage}-setverifiedstatus
+    events:
+      - http:
+          path: users/setverifiedstatus/{id}
+          method: put
+          cors: true
+  getverifiedStatus:
+    handler: services/users/getverifiedStatus.main
+    name: ${self:service}-${self:provider.stage}-getverifiedstatus
+    events:
+      - http:
+          path: users/getverifiedstatus/{id}
+          method: get
+          cors: true
+  adminAPI:
+    handler: apis/adminAPI/index.handler
+    name: ${self:service}-${self:provider.stage}-adminAPI
+    events:
+      - http:
+          path: admin/{proxy+}
+          method: any
+          cors: true
+          authorizer:
+            name: adminAuthorizerFunc
+            type: token
+  generalAPI:
+    handler: apis/generalAPI/index.handler
+    name: ${self:service}-${self:provider.stage}-generalAPI
+    events:
+      - http:
+          path: general/{proxy+}
+          method: any
+          cors: true
+  consumerAPI:
+    handler: apis/consumerAPI/index.handler
+    name: ${self:service}-${self:provider.stage}-consumerAPI
+    events:
+      - http:
+          path: consumer/{proxy+}
+          method: any
+          cors: true
+          authorizer:
+            name: authorizerFunc
+            type: token
+  authorizerFunc:
+    handler: services/auth/authorizer.handler
+    identitySource: method.request.header.Authorization
+  adminAuthorizerFunc:
+    handler: services/auth/adminAuthorizerFunc.handler
+    identitySource: method.request.header.Authorization
+  ScheduledProduct:
+    handler: services/schedule/activateproduct.main
+    name: ${self:service}-${self:provider.stage}-scheduleproduct
+
+  # adminFunctions:
+  #   handler: services/admin/index.handler
+  #   name: ${self:service}-${self:provider.stage}-adminfunctions
+  #   events: 
+  #     - http:
+  #         path: /
+  #         method: ANY
+  #         cors: true
+  #         authorizer:
+  #           name: adminAuthorizerFunc
+  #           type: token
+  #     - http: 
+  #         path: /{proxy+}
+  #         method: ANY
+  #         cors: true
+  #         authorizer:
+  #           name: adminAuthorizerFunc
+  #           type: token
+  # extendToken:
+  #   handler: services/auth/extendtoken.main
+  #   name: ${self:service}-${self:provider.stage}-extendtoken
+  #   events:
+  #     - http:
+  #         path: auth/extendtoken
+  #         method: post
+  #         cors: true
+  # updateUserId:
+  #   handler: services/custom/updateUserId.main
+  #   name: ${self:service}-${self:provider.stage}-updateuserid
+  #   events:
+  #     - http:
+  #         path: custom/updateuserid
+  #         method: put
+  #         cors: true
+  # replyMessage:
+  #   handler: services/auth/sendcustomemail.main
+  #   events:
+  #     - cognitoUserPool:
+  #         pool: ${env:PRJ}-user-pool
+  #         trigger: CustomMessage
+  #         existing: true
+plugins:
+  - serverless-bundle
+  - serverless-offline
+  - serverless-dotenv-plugin
+  - serverless-offline-lambda
+  - serverless-plugin-split-stacks
+  - serverless-sequelize-migrations
+resources:
+  - ${file(resources/watch-permission.yml)}    
+  - ${file(resources/api-gateway-errors.yml)}
+#   Resources:
+# #     ApiGatewayRestApi:
+# #       Type: AWS::ApiGateway::RestApi
+# #       Properties:
+# #         Name: ${self:service}-${self:custom.stage}
+#     GatewayResponseDefault4XX:
+#       Type: 'AWS::ApiGateway::GatewayResponse'
+#       Properties:
+#         ResponseParameters:
+#           gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+#           gatewayresponse.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+#           gatewayresponse.header.Access-Control-Allow-Methods: "'*'"
+#         ResponseType: DEFAULT_4XX
+#         RestApiId:
+#           Ref: 'ApiGatewayRestApi'
+#     GatewayResponseDefault5XX:
+#       Type: 'AWS::ApiGateway::GatewayResponse'
+#       Properties:
+#         ResponseParameters:
+#           gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+#           gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+#         ResponseType: DEFAULT_5XX
+#         RestApiId:
+#           Ref: 'ApiGatewayRestApi'
+# resources:
+  # Resources:
+  #   NewProductTopic:
+  #     Type: AWS::Cognito::UserPool
+  #     Properties:
+  #       TopicName: new_products_notify
+   # Load .env as environment variables   
+#    The following are a few example events you can configure
+#    NOTE: Please make sure to change your handler code to work with those events
+#    Check the event documentation for details
+#    events:
+#      - http:
+#          path: users/create
+#          method: get
+#      - websocket: $connect
+#      - s3: ${env:BUCKET}
+#      - schedule: rate(10 minutes)
+#      - sns: greeter-topic
+#      - stream: arn:aws:dynamodb:region:XXXXXX:table/foo/stream/1970-01-01T00:00:00.000
+#      - alexaSkill: amzn1.ask.skill.xx-xx-xx-xx
+#      - alexaSmartHome: amzn1.ask.skill.xx-xx-xx-xx
+#      - iot:
+#          sql: "SELECT * FROM 'some_topic'"
+#      - cloudwatchEvent:
+#          event:
+#            source:
+#              - "aws.ec2"
+#            detail-type:
+#              - "EC2 Instance State-change Notification"
+#            detail:
+#              state:
+#                - pending
+#      - cloudwatchLog: '/aws/lambda/hello'
+#      - cognitoUserPool:
+#          pool: MyUserPool
+#          trigger: PreSignUp
+#      - alb:
+#          listenerArn: arn:aws:elasticloadbalancing:us-east-1:XXXXXX:listener/app/my-load-balancer/50dc6c495c0c9188/
+#          priority: 1
+#          conditions:
+#            host: example.com
+#            path: /hello
+
+#    Define function environment variables here
+#    environment:
+#      variable2: value2
+
+# you can add CloudFormation resource templates here
+#resources:
+#  Resources:
+#    NewResource:
+#      Type: AWS::S3::Bucket
+#      Properties:
+#        BucketName: my-new-bucket
+#  Outputs:
+#     NewOutput:
+#       Description: "Description for the output"
+#       Value: "Some output value"

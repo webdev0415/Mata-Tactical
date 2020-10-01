@@ -1,0 +1,68 @@
+Resources:
+  GatewayResponseDefault4XX:
+    Type: 'AWS::ApiGateway::GatewayResponse'
+    Properties:
+      ResponseParameters:
+        gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+        gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+      ResponseType: DEFAULT_4XX
+      RestApiId:
+        Ref: 'ApiGatewayRestApi'
+  GatewayResponseDefault5XX:
+    Type: 'AWS::ApiGateway::GatewayResponse'
+    Properties:
+      ResponseParameters:
+        gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+        gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+      ResponseType: DEFAULT_5XX
+      RestApiId:
+        Ref: 'ApiGatewayRestApi'
+  ExpiredGatewayResponse:
+    Type: 'AWS::ApiGateway::GatewayResponse'
+    Properties:
+      ResponseParameters:
+        gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+        gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+      ResponseType: EXPIRED_TOKEN
+      ResponseTemplates:
+        application/json: |
+          {
+            "success":false,
+            "message":"Token Expired"
+          }
+      RestApiId:
+        Ref: 'ApiGatewayRestApi'
+        StatusCode: '401'
+  AuthFailureGatewayResponse:
+    Type: 'AWS::ApiGateway::GatewayResponse'
+    Properties:
+      ResponseParameters:
+        gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+        gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+      ResponseTemplates:
+        application/json: |
+          {
+            "success":false,
+            "message":$context.error.messageString
+          }
+      ResponseType: UNAUTHORIZED
+      RestApiId:
+        Ref: 'ApiGatewayRestApi'
+      StatusCode: '401'
+  DenyFailureGatewayResponse:
+    Type: 'AWS::ApiGateway::GatewayResponse'
+    Properties:
+      ResponseParameters:
+        gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+        gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+      ResponseTemplates:
+            #https://stackoverflow.com/a/49806967/10212963
+        application/json: |
+          {
+            "success":false,
+            "message":"$context.authorizer.customErrorMessage"
+          }
+      ResponseType: ACCESS_DENIED
+      RestApiId:
+        Ref: 'ApiGatewayRestApi'
+      StatusCode: '403'

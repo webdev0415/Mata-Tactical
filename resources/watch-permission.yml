@@ -1,0 +1,9 @@
+Resources:
+  ScheduledProductResourcePolicy:
+    Type: 'AWS::Lambda::Permission'
+    Properties:
+      FunctionName: ${self:service}-${self:provider.stage}-scheduleproduct
+      Action: 'lambda:invokeFunction'
+      Principal: 'events.amazonaws.com'
+      SourceArn:
+        Fn::Sub: 'arn:aws:events:${self:custom.secrets.${self:provider.stage}.region}:${self:custom.secrets.${self:provider.stage}.account_id}:rule/*'
